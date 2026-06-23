@@ -1,0 +1,34 @@
+[
+    {
+        "index": 0,
+        "type": "Linear",
+        "weights_file": "layer_0_Linear_W.bin",
+        "bias_file": "layer_0_Linear_B.bin",
+        "shape_W": [
+            4,
+            8
+        ],
+        "shape_B": [
+            4,
+            8
+        ]
+    },
+    {
+        "index": 1,
+        "type": "ReLU"
+    },
+    {
+        "index": 2,
+        "type": "Linear",
+        "weights_file": "layer_2_Linear_W.bin",
+        "bias_file": "layer_2_Linear_B.bin",
+        "shape_W": [
+            8,
+            1
+        ],
+        "shape_B": [
+            8,
+            1
+        ]
+    }
+]
