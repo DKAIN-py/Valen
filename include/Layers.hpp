@@ -1,8 +1,9 @@
 #pragma once
 #include "Nexus.hpp"
 #include<string>
+#include"BaseForward.hpp"
 
-class Linear {
+class Linear : public BaseForward{
     public:
         Nexus weights;
         Nexus bias;
@@ -13,5 +14,5 @@ class Linear {
 
         void load_parameters(const std::string& weights_path, const std::string& bias_path);
 
-        Nexus forward(const Nexus& input);
+        Nexus forward(const Nexus& input) override;
 };
