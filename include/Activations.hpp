@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Nexus.hpp"
 #include"BaseForward.hpp"
 
