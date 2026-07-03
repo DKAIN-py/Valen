@@ -26,8 +26,8 @@ Sequential CreateModel::create_model(const std::string& input){
             if(obj.type=="Linear"){
                 int in_f = obj.shape_W.value()[0];
                 int out_f = obj.shape_W.value()[1];
-                std::string w_file = obj.weights_file.value();
-                std::string b_file = obj.bias_file.value();
+                std::string w_file = input+"/"+obj.weights_file.value();
+                std::string b_file = input+"/"+obj.bias_file.value();
                 
                 std::unique_ptr<Linear> l1 = std::make_unique<Linear>(in_f, out_f);
                 l1->load_parameters(w_file, b_file);
