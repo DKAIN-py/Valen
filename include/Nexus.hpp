@@ -13,6 +13,8 @@ class Nexus {
 
         void load_from_binary(const std::string& filepath);
 
+        void load_input(const std::vector<std::vector<float>>& input);
+
         inline int get_index(int row, int col) const {
             return row*shape[1] + col;
         }
