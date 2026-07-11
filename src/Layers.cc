@@ -2,6 +2,8 @@
 #include<vector>
 #include<string>
 #include<fstream>
+#include<chrono>
+#include<iostream>
 
 Linear::Linear(int in_f, int out_f) : in_features(in_f), out_features(out_f) {
     weights = Nexus({in_features, out_features});
@@ -17,6 +19,8 @@ Nexus Linear::forward(const Nexus& input){
     int batch_size = input.shape[0];
     Nexus output({batch_size, out_features});
 
+    // Compute kernel performence monitoring
+    auto start_comput = std::chrono::high_resolution_clock::now();
     for(int b = 0; b<batch_size; ++b){
         for(int out = 0; out<out_features; ++out){
             float accumulator = 0.0f;
@@ -31,6 +35,12 @@ Nexus Linear::forward(const Nexus& input){
             output.data[out_idx] = accumulator + bias.data[bias_idx];
         }
     }
+    auto end_comput = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::milli> compute_time_ms = end_comput - start_comput;
+    std::cout << "\n========================================\n";
+    std::cout << "📊 VALEN COMPUTE KERNEL METRICS:\n";
+    std::cout << "   Strict Calculation Time: " << compute_time_ms.count() << " ms\n";
+    std::cout << "========================================\n";
 
     return output;
 }

@@ -1,0 +1,38 @@
+========================================
+📊 VALEN COMPUTE KERNEL METRICS:
+   Strict Calculation Time: 55.6141 ms
+========================================
+
+========================================
+📊 VALEN COMPUTE KERNEL METRICS:
+   Strict Calculation Time: 14.8338 ms
+========================================
+
+
+ Performance counter stats for './valen examples/iris':
+
+                 0      context-switches:u               #      0.0 cs/sec  cs_per_second     
+                 0      cpu-migrations:u                 #      0.0 migrations/sec  migrations_per_second
+             6,690      page-faults:u                    #  13963.3 faults/sec  page_faults_per_second
+            479.11 msec task-clock:u                     #      1.0 CPUs  CPUs_utilized       
+         1,199,309      cpu_core/branch-misses/u         #      0.1 %  branch_miss_rate         (99.50%)
+       862,468,019      cpu_core/branches/u              #   1800.1 M/sec  branch_frequency     (99.50%)
+     1,765,392,771      cpu_core/cpu-cycles/u            #      3.7 GHz  cycles_frequency       (99.50%)
+     5,808,318,403      cpu_core/instructions/u          #      3.3 instructions  insn_per_cycle  (99.50%)
+           984,040      cpu_atom/branch-misses/u         #      6.3 %  branch_miss_rate         (0.12%)
+       181,275,732      cpu_atom/branches/u              #    378.4 M/sec  branch_frequency     (0.32%)
+       677,116,827      cpu_atom/cpu-cycles/u            #      1.4 GHz  cycles_frequency       (0.50%)
+     1,606,233,910      cpu_atom/instructions/u          #      2.4 instructions  insn_per_cycle  (0.50%)
+             TopdownL1 (cpu_core)                        #      3.6 %  tma_bad_speculation    
+                                                         #     11.7 %  tma_frontend_bound       (99.50%)
+                                                         #     26.3 %  tma_backend_bound      
+                                                         #     58.4 %  tma_retiring             (99.50%)
+             TopdownL1 (cpu_atom)                        #     16.2 %  tma_backend_bound        (0.18%)
+                                                         #      nan %  tma_frontend_bound       (0.00%)
+                                                         #      nan %  tma_bad_speculation    
+                                                         #      nan %  tma_retiring             (0.00%)
+
+       0.481079369 seconds time elapsed
+
+       0.470283000 seconds user
+       0.008967000 seconds sys
