@@ -38,7 +38,7 @@ Nexus Linear::forward(const Nexus& input){
     auto end_comput = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::milli> compute_time_ms = end_comput - start_comput;
     std::cout << "\n========================================\n";
-    std::cout << "📊 VALEN COMPUTE KERNEL METRICS:\n";
+    std::cout << "VALEN COMPUTE KERNEL METRICS:\n";
     std::cout << "   Strict Calculation Time: " << compute_time_ms.count() << " ms\n";
     std::cout << "========================================\n";
 

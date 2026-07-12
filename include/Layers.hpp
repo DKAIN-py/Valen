@@ -4,6 +4,8 @@
 #include"BaseForward.hpp"
 
 class Linear : public BaseForward{
+    private:
+    
     public:
         Nexus weights;
         Nexus bias;
