@@ -9,7 +9,7 @@
 
 using json = nlohmann::json;
 
-Sequential CreateModel::create_model(const std::string& input){
+Sequential CreateModel::create_model(const std::string& input, const Threadpool& pool_ref){
         std::string manifest_path = input+"/model_manifest.json";
 
         std::ifstream file(manifest_path);
@@ -24,12 +24,13 @@ Sequential CreateModel::create_model(const std::string& input){
         for(const auto& obj : model_manifest){
             
             if(obj.type=="Linear"){
+            
                 int in_f = obj.shape_W.value()[0];
                 int out_f = obj.shape_W.value()[1];
                 std::string w_file = input+"/"+obj.weights_file.value();
                 std::string b_file = input+"/"+obj.bias_file.value();
                 
-                std::unique_ptr<Linear> l1 = std::make_unique<Linear>(in_f, out_f);
+                std::unique_ptr<Linear> l1 = std::make_unique<Linear>(in_f, out_f, pool_ref);
                 l1->load_parameters(w_file, b_file);
                 
                 model.add(std::move(l1));

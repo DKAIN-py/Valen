@@ -6,6 +6,7 @@
 #include"json.hpp"
 #include"Layers.hpp"
 #include"Activations.hpp"
+#include"Threadpool.hpp"
 
 using json = nlohmann::json;
 
@@ -42,6 +43,6 @@ class CreateModel{
     public:
         CreateModel() = default;
 
-        Sequential create_model(const std::string& input);
+        Sequential create_model(const std::string& input, const Threadpool& pool_ref);
 };
 

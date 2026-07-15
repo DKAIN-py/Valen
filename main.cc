@@ -4,14 +4,18 @@
 #include"model_creation.hpp"
 #include"models.hpp"
 #include<fstream>
+#include"Threadpool.hpp"
 
 using json = nlohmann::json;
 
 int main(int argc, char* argv[]){
     std::string dir_path = argv[1];
 
+    size_t threads = std::thread::hardware_concurrency();
+    Threadpool pool(threads);
+    
     CreateModel builder;
-    Sequential model = builder.create_model(dir_path);
+    Sequential model = builder.create_model(dir_path, pool);
     
     std::ifstream file("iris_dummy_data.json");
         if (!file.is_open()) {

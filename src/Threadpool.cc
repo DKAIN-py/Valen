@@ -28,7 +28,7 @@ Threadpool::Threadpool(size_t threads){
     }
 }
 
-void Threadpool::enqueue_task(std::function<void()> task){
+void Threadpool::enqueue_task(std::function<void()> task) const {
     {
         std::lock_guard<std::mutex> lock(this->queue_mutex);
         if(this->stop) throw std::runtime_error("Enqueueing on stopped Threadpool");

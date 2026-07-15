@@ -16,6 +16,6 @@ class Nexus {
         void load_input(const std::vector<std::vector<float>>& input);
 
         inline int get_index(int row, int col) const {
-            return row*shape[1] + col;
+            return row*shape.at(1) + col;
         }
 };  
