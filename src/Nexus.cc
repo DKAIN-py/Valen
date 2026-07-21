@@ -1,4 +1,7 @@
+// Manual Headers
 #include "Nexus.hpp"
+
+// Standard Library
 #include<fstream>
 #include<iostream>
 
@@ -50,3 +53,15 @@ void Nexus::load_input(const std::vector<std::vector<float>>& input){
     };
 }
 
+void Nexus::update_strides(){
+    this->strides.resize(this->shape.size());
+
+    if(strides.empty()) return;
+
+    int current_stride = 1;
+
+    for(int i = static_cast<int>(this->shape.size()) - 1; i>=0; --i){
+        strides[i] = current_stride;
+        current_stride *= shape[i];
+    }
+}
