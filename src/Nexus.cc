@@ -65,3 +65,21 @@ void Nexus::update_strides(){
         current_stride *= shape[i];
     }
 }
+
+std::vector<std::vector<float>> Nexus::get_ndim_data(){
+    std::vector<std::vector<float>> ndarray;
+    int n = this->shape[0];
+    int m = this->shape[1];
+
+    std::vector<float> temp;
+    int n_stride = 0;
+    int m_stride = m;
+    for(size_t i{0}; i<this->shape[0]; i++){
+        temp.assign(this->data.begin() + n_stride, this->data.begin()+m_stride);
+        ndarray.push_back(temp);
+        n_stride=m_stride;
+        m_stride+=m;
+    }
+
+    return ndarray;
+}

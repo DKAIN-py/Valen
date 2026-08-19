@@ -28,4 +28,6 @@ class Nexus {
 
             return flat_idx;
         }
+
+        std::vector<std::vector<float>> get_ndim_data();
 };  
