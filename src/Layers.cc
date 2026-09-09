@@ -107,3 +107,21 @@ Nexus Linear::forward(const Nexus& input){
 
     return output;
 }
+
+
+// 2D Convlution
+
+Conv2D::Conv2D(std::vector<int> kernel_size, int in_channels, int out_channels, int stride, int padding, const Threadpool& pool_ref) : pool(pool_ref){
+    this->kernel_size = kernel_size;
+    this->in_channels = in_channels;
+    this->stride = stride;
+    this->padding = padding;
+    this->weights = Nexus({out_channels, in_channels*kernel_size[0]*kernel_size[1]});
+    this->bias = Nexus({out_channels, 1});
+}
+
+void Conv2D::load_parameters(const std::string& weights_path, const std::string& bias_path){
+    weights.load_from_binary(weights_path);
+    bias.load_from_binary(bias_path);
+}
+
