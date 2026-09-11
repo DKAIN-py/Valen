@@ -30,4 +30,6 @@ class Nexus {
         }
 
         std::vector<std::vector<float>> get_ndim_data();
+
+        
 };  

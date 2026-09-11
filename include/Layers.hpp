@@ -37,7 +37,17 @@ class Conv2D : public BaseForward{
 
         void load_parameters(const std::string& weights_path, const std::string& bias_path);
 
-        Nexus im2col(Nexus input, int kh, int kw, int stride, int padding);
+        Nexus im2col(Nexus& input, int kh, int kw, int stride, int padding);
+
+        Nexus forward(const Nexus& input) override;
+};
+
+class MaxPool2D : public BaseForward{
+    public:
+        std::vector<int> kernel_size;
+        int stride;
+
+        MaxPool2D(std::vector<int> kernel_size, int stride);
 
         Nexus forward(const Nexus& input) override;
 };
