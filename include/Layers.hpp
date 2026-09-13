@@ -44,12 +44,20 @@ class Conv2D : public BaseForward{
         Nexus forward(const Nexus& input) override;
 };
 
+
 class MaxPool2D : public BaseForward{
     public:
         std::vector<int> kernel_size;
-        int stride;
+        int stride{-1};
 
         MaxPool2D(std::vector<int> kernel_size, int stride);
 
+        Nexus forward(const Nexus& input) override;
+};
+
+class Flatten : public BaseForward{
+    public:
+        Flatten() = default;
+        
         Nexus forward(const Nexus& input) override;
 };

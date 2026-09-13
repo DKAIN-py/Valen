@@ -1,0 +1,55 @@
+[
+    {
+        "index": 0,
+        "type": "Conv2D",
+        "weights_file": "layer_0_Conv2D_W.bin",
+        "bias_file": "layer_0_Conv2D_B.bin",
+        "shape_W": [
+            4,
+            9
+        ],
+        "shape_B": [
+            4,
+            1
+        ],
+        "kernel_size": [
+            3,
+            3
+        ],
+        "in_channels": 1,
+        "out_channels": 4,
+        "stride": 1,
+        "padding": 1
+    },
+    {
+        "index": 1,
+        "type": "ReLU"
+    },
+    {
+        "index": 2,
+        "type": "MaxPool2D",
+        "kernel_size": [
+            2,
+            2
+        ],
+        "stride": 2
+    },
+    {
+        "index": 3,
+        "type": "Flatten"
+    },
+    {
+        "index": 4,
+        "type": "Linear",
+        "weights_file": "layer_4_Linear_W.bin",
+        "bias_file": "layer_4_Linear_B.bin",
+        "shape_W": [
+            784,
+            10
+        ],
+        "shape_B": [
+            1,
+            10
+        ]
+    }
+]

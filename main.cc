@@ -23,30 +23,52 @@ int main(int argc, char* argv[]){
     Sequential model = builder.create_model(dir_path, pool);
     
     CROW_ROUTE(app, "/").methods(crow::HTTPMethod::POST)
-    ([&model](const crow::request& req){
-        std::cout<<"Hit the home route "<<"\n";
-        
-        json json_data;
+    ([&model](const crow::request& req) {
+        std::cout << "Hit the home route\n";
 
-        try{
-            json_data = json::parse(req.body);
-
-        }catch(const json::parse_error& e){
-            std::cerr<<"JSON Parsing error:"<<e.what()<<std::endl;
-            return crow::response(400, "Invalid JSON payload");
+        // 1. Check for the custom shape header
+        std::string shape_header = req.get_header_value("X-Tensor-Shape");
+        if (shape_header.empty()) {
+            return crow::response(400, "Missing X-Tensor-Shape header");
         }
-    
-        std::vector<std::vector<float>> value = json_data.get<std::vector<std::vector<float>>>();
-        
-        int batch_size = static_cast<int>(value.size());
-        int features = static_cast<int>(value[0].size());
-        Nexus input({batch_size, features});    
-        
-        input.load_input(value);
-        Nexus res = model.ForwardPass(input);
-        json response_data = res.get_ndim_data();
 
-        return crow::response(200, response_data.dump());
+        // 2. Parse the dynamic shape string (e.g., "64,1,28,28" or "128,784" or "32,128,512")
+        std::vector<int> shape;
+        std::stringstream ss(shape_header);
+        std::string token;
+        size_t expected_elements = 1;
+
+        try {
+            while (std::getline(ss, token, ',')) {
+                int dim = std::stoi(token);
+                shape.push_back(dim);
+                expected_elements *= dim;
+            }
+        } catch (const std::exception& e) {
+            return crow::response(400, "Invalid X-Tensor-Shape format");
+        }
+
+        // 3. Verify payload size against expected float count
+        size_t expected_bytes = expected_elements * sizeof(float);
+        if (req.body.size() != expected_bytes) {
+            std::cerr << "Payload size mismatch! Expected: " << expected_bytes 
+                      << " bytes, Got: " << req.body.size() << " bytes\n";
+            return crow::response(400, "Payload size does not match X-Tensor-Shape");
+        }
+
+        // 4. Construct Nexus tensor dynamically and memcpy raw floats
+        Nexus input(shape);
+        std::memcpy(input.data.data(), req.body.data(), expected_bytes);
+
+        // 5. Run Forward Pass
+        Nexus res = model.ForwardPass(input);
+
+        // 6. Return response as JSON using nlohmann::json
+        json response_data = res.get_ndim_data();
+        
+        crow::response crow_res(200, response_data.dump());
+        crow_res.set_header("Content-Type", "application/json");
+        return crow_res;
     });
 
     app.port(8080).run();

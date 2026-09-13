@@ -35,6 +35,43 @@ Sequential CreateModel::create_model(const std::string& input, const Threadpool&
                 
                 model.add(std::move(l1));
             }
+
+            else if(obj.type=="Conv2D"){
+                int w_h = obj.shape_W.value()[0];
+                int w_w = obj.shape_W.value()[1];
+                int b_h = obj.shape_B.value()[0];
+                int b_w = obj.shape_B.value()[1];
+                std::string w_file = input+"/"+obj.weights_file.value();
+                std::string b_file = input+"/"+obj.bias_file.value();
+                std::vector<int> kernel_size = obj.kernel_size.value();
+                int padding = obj.padding.value();
+                int in_channels = obj.in_channels.value();
+                int out_channels = obj.out_channels.value();
+                int stride = obj.stride.value();
+
+                std::unique_ptr<Conv2D> c1 = std::make_unique<Conv2D>(
+                    kernel_size, in_channels, out_channels, stride,
+                    padding, padding, pool_ref
+                );
+
+                c1->load_parameters(w_file, b_file);
+
+                model.add(std::move(c1));
+            }
+
+            else if(obj.type=="MaxPool2D"){
+                std::vector<int> kernel_size = obj.kernel_size.value();
+                int stride = obj.stride.value();
+
+                std::unique_ptr<MaxPool2D> m = std::make_unique<MaxPool2D>(kernel_size, stride);
+
+                model.add(std::move(m));
+            }
+
+            else if(obj.type=="Flatten"){
+                model.add(std::make_unique<Flatten>());
+            }
+
             else if(obj.type=="ReLU"){
                 model.add(std::make_unique<ReLU>());
             }

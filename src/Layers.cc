@@ -102,7 +102,7 @@ Nexus Linear::forward(const Nexus& input){
     auto end_comput = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::milli> compute_time_ms = end_comput - start_comput;
     std::cout << "\n========================================\n";
-    std::cout << "VALEN COMPUTE KERNEL METRICS:\n";
+    std::cout << "VALEN LINEAR COMPUTE KERNEL METRICS:\n";
     std::cout << "   Strict Calculation Time: " << compute_time_ms.count() << " ms\n";
     std::cout << "========================================\n";
 
@@ -278,6 +278,9 @@ Nexus Conv2D::forward(const Nexus& input){
     int batch_cols = N*H_out*W_out;
     int out_features = out_channels;
 
+    // Compute kernel performence monitoring
+    auto start_comput = std::chrono::high_resolution_clock::now();
+
     for(int i{0}; i<threads; i++){
         int start = i*batches_per_thread;
         int end = (i==threads-1) ? (effective_batch_size-1) : (start+batches_per_thread-1);
@@ -306,4 +309,122 @@ Nexus Conv2D::forward(const Nexus& input){
     }
     
     barrier.wait();
+
+    auto end_comput = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::milli> compute_time_ms = end_comput - start_comput;
+    std::cout << "\n========================================\n";
+    std::cout << "VALEN CONV2D COMPUTE KERNEL METRICS:\n";
+    std::cout << "   Strict Calculation Time: " << compute_time_ms.count() << " ms\n";
+    std::cout << "========================================\n";
+
+    Nexus output_4d({N, this->out_channels, H_out, W_out});
+
+    const float* src_mat = output_mat.data.data();
+    float* dst_4d = output_4d.data.data();
+
+    int spatial_size = H_out * W_out;
+
+    // Transpose axes (C_out, N, H_out, W_out) -> (N, C_out, H_out, W_out)
+    for (int n = 0; n < N; ++n) {
+        for (int c = 0; c < this->out_channels; ++c) {
+            int src_offset = c * (N * spatial_size) + n * spatial_size;
+            int dst_offset = n * (this->out_channels * spatial_size) + c * spatial_size;
+
+            // Copy entire spatial patch (H_out * W_out) in one vectorized instruction
+            std::copy(src_mat + src_offset, src_mat + src_offset + spatial_size, dst_4d + dst_offset);
+        }
+    }
+    
+    return output_4d;
+}
+
+
+// MaxPool2D
+
+using Dynamic4DExtents = std::dextents<int, 4>;
+
+MaxPool2D::MaxPool2D(std::vector<int> kernel_size, int stride) : kernel_size(kernel_size), stride(stride){}
+
+Nexus MaxPool2D::forward(const Nexus& input){
+        // Compute kernel performence monitoring
+    auto start_comput = std::chrono::high_resolution_clock::now();
+    std::vector<float> x_val = input.data;
+
+    int kh = this->kernel_size[0];
+    int kw = this->kernel_size[1];
+
+    if(this->stride==-1) this->stride = kh;
+    
+    int N = input.shape[0];
+    int C = input.shape[1];
+    int H = input.shape[2];
+    int W = input.shape[3];
+
+    int H_out = (H-kh)/this->stride + 1;
+    int W_out = (W-kw)/this->stride + 1;
+
+    int x_stride_3{1};
+    int x_stride_2{W};
+    int x_stride_1{H*W};
+    int x_stride_0{C*H*W};
+
+    Dynamic6DExtents patches_shape(N,C,H_out,W_out,kh,kw);
+    std::array<int, 6> patches_stride = {
+        x_stride_0,
+        x_stride_1,
+        x_stride_2*this->stride,
+        x_stride_3*this->stride,
+        x_stride_2,
+        x_stride_3
+    };
+
+    std::layout_stride::mapping patches_map(patches_shape, patches_stride);
+    std::mdspan patches(x_val.data(), patches_map);
+
+    Nexus output({N,C,H_out,W_out});
+    Dynamic4DExtents out_shape(N, C,H_out,W_out);
+    std::mdspan out_val_view(output.data.data(), out_shape);
+
+    for (int n = 0; n < N; ++n) {
+        for (int c = 0; c < C; ++c) {
+            for (int h = 0; h < H_out; ++h) {
+                for (int w = 0; w < W_out; ++w) {
+                    
+                    float max_val = -std::numeric_limits<float>::infinity();
+                    int max_idx = -1;
+                    
+                    for (int kh_i = 0; kh_i < kh; ++kh_i) {
+                        for (int kw_i = 0; kw_i < kw; ++kw_i) {
+                            float current = patches[n, c, h, w, kh_i, kw_i];
+                            if (current > max_val) {
+                                max_val = current;
+                            }
+                        }
+                    }
+                    out_val_view[n, c, h, w] = max_val;
+                }
+            }
+        }
+    }
+
+    auto end_comput = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::milli> compute_time_ms = end_comput - start_comput;
+    std::cout << "\n========================================\n";
+    std::cout << "VALEN MAXPOOL2D COMPUTE KERNEL METRICS:\n";
+    std::cout << "   Strict Calculation Time: " << compute_time_ms.count() << " ms\n";
+    std::cout << "========================================\n";
+
+    return output;
+}
+
+Nexus Flatten::forward(const Nexus& input){
+    int N = input.shape[0];
+
+    int flat_features{1};
+    for(size_t i{1}; i<input.shape.size(); ++i) flat_features *= input.shape[i];
+
+    Nexus output({N, flat_features});
+    output.data = input.data;
+
+    return output;
 }
