@@ -116,6 +116,7 @@ Nexus Linear::forward(const Nexus& input){
 Conv2D::Conv2D(std::vector<int> kernel_size, int in_channels, int out_channels, int stride, int pad_h, int pad_w, const Threadpool& pool_ref) : pool(pool_ref){
     this->kernel_size = kernel_size;
     this->in_channels = in_channels;
+    this->out_channels = out_channels;
     this->stride = stride;
     this->pad_h = pad_h;
     this->pad_w = pad_w;

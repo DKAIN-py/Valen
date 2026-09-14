@@ -16,9 +16,23 @@
 -- Nexus has get_index(int row, int col) method to retriev a element from the data vector from the POV of a matrix(to be made into a general tensor and be replaced by pointers in the forward pass).
 
 ### Layer
--- Currently there is only Linear layer.
+-- Linear layer
     - Linear layer has its own weight and bias Nexus object that are initialised during the model creation.
     - Forward is multithread optimized for batchsize > 100, for batchsize<=100 single (main) thread does the execution.
+
+-- Conv2D layer
+    - 2D Convlution Layer takes input a 4D Nexus object with atrribute batch_size, channels, height, width.
+    - Has weight and bias nexus object (2D).
+    - Uses im2col algorithm for convlution which outputs a matrix to do GEMM.
+    - Uses std::extents<int, 6> for padding and transpose view in im2col.
+
+-- MaxPool2D layer
+    - Maxpool2d layer.
+
+-- Flatten layer
+    - To fallten incoming object.
+    - Since we already store data in flat memory we dont need to change anything, its just a meta data (shape) change.
+
 
 ### Activations
 -- Currently there is only ReLU in the valen.
@@ -39,3 +53,20 @@
 ### Threadpool
 -- Made a generic Threadpool class to work as a stateless entity for mutlithreading whereever necceasarry.
 -- Currently used in parrallelzing the matrix multiplication in the Linear layer.
+
+### RESTapi
+-- We now fully support the data I/O through a RESTapi made with Crow library.
+-- It uses custom HTTP header,
+
+    headers = {
+            "Content-Type": "application/octet-stream",
+
+            "X-Tensor-Shape": shape_str
+        }
+    
+
+- shpe_str is json string joined by `,` (e.g 64,3,13,13) of the data begin sent.
+
+-   Data need to sent in raw bytes and in a C-contigious array, like
+
+        session.post(url, data=bx_np.tobytes(), headers=headers)
